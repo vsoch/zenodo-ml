@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from containertree import ContainerTree
+import shutil
 import tempfile
 import pickle
 import re
@@ -133,6 +134,9 @@ for uid, hit in hits.items():
 
                 # Metadata is tree and other hit
                 metadata = {'tree': tree, 'hit': hit}
+
+                # Clean up temporary directory
+                shutil.rmtree(repo)
 
                 # Save everything
                 pickle.dump(images, open(output_images,'wb'))
