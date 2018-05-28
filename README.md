@@ -8,6 +8,15 @@ see the section on Questions if you are looking for ideas of what to do with it.
  - [Usage](#usage): is likely what you are interseted in, how to use the dataset.
 
 
+## Assumptions
+
+ 1. We use an "image size" of 80 by 80, under the assumption that the typical editor / programming language prefers lines of max length 80 (see Python's Pep8 specification) and most machine learning algorithms prefer square images.
+ 2. We filter the files down to those less than or equal to 100,000 bytes (100KB --> 0.1 MB). This still leads to having on the order of a few thousand images (each 80x80) for one small script.
+ 3. We filter down the Zenodo repos to the first 10K within the set of the bucket called "software."
+ 4. I filtered out repos that (were strangely common) related to something to do with "gcube."
+ 5. We take a greedy approach in parsing files - in the case that a single file produces some special error, we pass it in favor of continued processing of the rest.
+
+
 ## Generation
 
 To generate the dataset, the entire code is provided in a Docker container. If you don't
@@ -105,7 +114,7 @@ It follows, then, that if we index images for a particular key, we are going to 
 we will find a giant list of 80x80 images, where each image is a 2D numpy array with characters converted
 to ordinal (as we showed above).
 
-
+**more coming soon!**
 
 ## Analysis Ideas
 
