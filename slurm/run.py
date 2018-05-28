@@ -147,7 +147,6 @@ def create_images(filepath, width=80, height=80):
     print('%s has %s %sx%s images' %(filepath, len(ordinal), width, height))
     return ordinal
 
-
 hits = pickle.load(open(records_pkl, 'rb'))
 print('Found %s records' %len(hits))
 
@@ -164,14 +163,20 @@ for url in links:
         if not os.path.exists(output_folder):
              os.mkdir(output_folder)
 
+        # Filename according to id
+        output_images = os.path.join(output_folder, 'images_%s.pkl' %hit['id'])
+        output_meta = os.path.join(output_folder, 'metadata_%s.pkl' %hit['id'])
+
+        # If we already have done it, skip and exit
+        if os.path.exists(output_images):
+            size = os.path.getsize(output_images) 
+            if size > 0:
+                print('Job already done!')
+                sys.exit(0)
+
         # Get file listing
         print('Parsing %s | %s' %(uid, url))
         files = get_files(repo)
-
-        # Filename according to id
-        output_images = os.path.join(output_folder, 'images_%s.pkl' %hit['id'])
-        output_ordinal = os.path.join(output_folder, 'ordinal_%s.pkl' %hit['id'])
-        output_meta = os.path.join(output_folder, 'metadata_%s.pkl' %hit['id'])
 
         # For each file, save pickle of images
         tree = make_containertree(uid, files, basepath=repo)
@@ -185,11 +190,11 @@ for url in links:
             size = os.path.getsize(f) 
             if size < size_limit:
    
-            # We will give the user ordinal
-            try:
-                images[name] = create_images(f)
-            except:
-                pass
+                # We will give the user ordinal
+                try:
+                    images[name] = create_images(f)
+                except:
+                    pass
 
             # Metadata is tree and other hit
             metadata = {'tree': tree, 'hit': hit}
