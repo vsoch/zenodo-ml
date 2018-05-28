@@ -96,7 +96,7 @@ def create_images(filepath, width=80, height=80):
     return ordinal
 
 
-hits = pickle.load(open('records.pkl', 'rb'))
+hits = pickle.load(open('%s/records.pkl' %here, 'rb'))
 print('Found %s records' %len(hits))
 
 # Create an output directory
@@ -119,7 +119,6 @@ for uid, hit in hits.items():
         for resource in hit['metadata']['related_identifiers']:
             if "github" in resource['identifier'] and uid not in seen:
                 url = resource['identifier']
-                print('Parsing %s | %s' %(uid, url)) 
 
                 # Cache seen in case need to start over
                 seen.append(uid)
@@ -143,6 +142,7 @@ for uid, hit in hits.items():
                 if process is True:
 
                     # Get file listing
+                    print('Parsing %s | %s' %(uid, url))
                     files = get_files(repo)
 
                     # Filename according to id

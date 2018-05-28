@@ -15,7 +15,20 @@ want to use the version on Docker Hub, you can build it locally.
 
 ```bash
 docker build -t vanessa/zenodo-ml .
+singularity pull --name zenodo-ml docker://vanessa/zenodo-ml
 ```
+
+### Sherlock at Stanford
+
+```bash
+module load singularity
+singularity pull --name zenodo-ml docker://vanessa/zenodo-ml
+mkdir -p $SCRATCH/zenodo-ml && cd $SCRATCH/zenodo-ml
+mv /scratch/users/vsochat/.singularity/zenodo-ml $SCRATCH/zenodo-ml/
+```
+
+Now you have a container binary called `zenodo-ml` in your `$SCRATCH/zenodo-ml` folder.
+
 
 ### Download from Zenodo
 
@@ -40,7 +53,8 @@ Once you have the `records.pkl` you can load them in for parsing! This will gene
 folder in your present working directory with subfolders, each corresponding to a Zenodo identifier.
 
 ```bash
-docker run -v $PWD:/code -it vanessa/zenodo-ml python /code/1.parse_records.py
+docker run -v $PWD:/data -it vanessa/zenodo-ml python /code/1.parse_records.py
+singularity exec zenodo-ml python /code/1.parse_records.py
 ```
 
 ### Loading Data
@@ -69,6 +83,29 @@ print(number)
 chr(number)
 'a'
 ```
+
+#### Images
+Here is how you would load and look at an image.
+
+```python
+import pickle
+
+image_pkl = os.path.abspath('data/1065022/images_1065022.pkl')
+images = pickle.load(open(image_pkl, 'rb'))
+```
+
+Remember, this entire pickle is for just one repository that is found in a record from Zenodo! If you
+look at the images "keys" you will see that each one corresponds to a file in the repository.
+
+```python
+images.keys()
+```
+
+It follows, then, that if we index images for a particular key, we are going to find images! Specifically,
+we will find a giant list of 80x80 images, where each image is a 2D numpy array with characters converted
+to ordinal (as we showed above).
+
+
 
 ## Analysis Ideas
 
