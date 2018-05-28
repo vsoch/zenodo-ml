@@ -47,7 +47,7 @@ def make_containertree(uid, files, basepath=None):
 def create_array(ordinal, width=80):
     '''create array from list of ordinals'''
     df = pandas.DataFrame(ordinal).loc[:,0:width-1]
-    return df.as_matrix()
+    return df.values
 
 
 def create_images(filepath, width=80, height=80):
