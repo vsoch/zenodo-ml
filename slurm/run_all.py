@@ -75,4 +75,4 @@ for zid in zenodo_ids:
         filey.writelines("#SBATCH --mem=8000\n")
         filey.writelines('ml singularity\n')
         args = "%s %s %s" %(zid, outfolder, database)
-        filey.writelines('PYTHONPATH= singularity exec %s /opt/conda/bin/python /code/slurm/run.py %s' %(container, args))
+        filey.writelines('PYTHONPATH= singularity exec --bind %s:/code %s /opt/conda/bin/python /code/run.py %s' %(here, container, args))
