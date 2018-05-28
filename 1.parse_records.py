@@ -19,6 +19,7 @@ def download_repo(repo, branch):
     tmpdir = tempfile.mkdtemp()
     os.chdir(tmpdir)
     repo = repo.strip('/')
+    branch = branch.strip('/')
     res = os.system('git clone -b %s %s' %(branch, repo))
     if res != 0:
         res = os.system('git clone %s' %(repo))
@@ -120,9 +121,10 @@ print('Seen %s records' %len(seen))
 missed = []
 
 for uid, hit in hits.items():
+    output_folder = os.path.join(output_data, '%s' %hit['id'])
     if 'related_identifiers' in hit['metadata']:
         for resource in hit['metadata']['related_identifiers']:
-            if "github" in resource['identifier'] and uid not in seen:
+            if "github" in resource['identifier'] and (uid not in seen or not os.path.exists(output_folder)):
                 url = resource['identifier']
 
                 # Cache seen in case need to start over
