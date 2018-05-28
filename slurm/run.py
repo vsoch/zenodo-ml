@@ -70,6 +70,8 @@ def download_repo(url):
             result = unzip(filename, dest)
         elif filename.endswith('gz'):
             result = untar(filename, dest)
+        # Clean up download
+        os.remove(filename)
     return result
  
 
