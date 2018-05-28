@@ -168,13 +168,6 @@ for url in links:
         output_images = os.path.join(output_folder, 'images_%s.pkl' %hit['id'])
         output_meta = os.path.join(output_folder, 'metadata_%s.pkl' %hit['id'])
 
-        # If we already have done it, skip and exit
-        if os.path.exists(output_images):
-            size = os.path.getsize(output_images) 
-            if size > 0:
-                print('Job already done!')
-                sys.exit(0)
-
         # Get file listing
         print('Parsing %s | %s' %(uid, url))
         files = get_files(repo)
@@ -200,9 +193,9 @@ for url in links:
             # Metadata is tree and other hit
             metadata = {'tree': tree, 'hit': hit}
 
-            # Clean up temporary directory
-            shutil.rmtree(repo)
-
             # Save everything
             pickle.dump(images, open(output_images,'wb'))
             pickle.dump(metadata, open(output_meta,'wb'))
+
+    # Clean up temporary directory
+    shutil.rmtree(repo)
