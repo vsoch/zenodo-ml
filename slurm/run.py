@@ -30,7 +30,7 @@ import re
 import os
 
 # The zenodo uid
-uid = sys.argv[1]
+uid = int(sys.argv[1])
 
 # Output folder for pickles
 output_folder = sys.argv[2]
