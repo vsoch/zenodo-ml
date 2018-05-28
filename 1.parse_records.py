@@ -18,6 +18,7 @@ def download_repo(repo, branch):
     '''download a Github repository'''
     tmpdir = tempfile.mkdtemp()
     os.chdir(tmpdir)
+    repo = repo.strip('/')
     res = os.system('git clone -b %s %s' %(branch, repo))
     if res != 0:
         res = os.system('git clone %s' %(repo))
