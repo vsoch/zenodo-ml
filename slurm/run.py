@@ -152,7 +152,7 @@ hits = pickle.load(open(records_pkl, 'rb'))
 print('Found %s records' %len(hits))
 
 hit = hits[uid]
-links = [y['self'] for y in [x['links'] for x in hits['files']]]
+links = [y['self'] for y in [x['links'] for x in hit['files']]]
 for url in links:
 
     # Download tar.gz repository
