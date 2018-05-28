@@ -175,7 +175,10 @@ for uid, hit in hits.items():
                             if size < size_limit:
    
                                 # We will give the user ordinal
-                                images[name] = create_images(f)
+                                try:
+                                    images[name] = create_images(f)
+                                except:
+                                    pass
 
                     # Metadata is tree and other hit
                     metadata = {'tree': tree, 'hit': hit}
