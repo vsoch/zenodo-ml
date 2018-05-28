@@ -18,6 +18,7 @@
 import requests
 import pickle
 import sys
+import os
 
 def read_file(file_name):
     with open(file_name) as filey:

@@ -21,15 +21,27 @@ Make sure it's loaded
 
 ```bash
 which singularity
+/share/software/user/open/singularity/2.4.6/bin/singularity
 ```
 
-## Container
+### Repository
+
+The scripts are provided in the container, but since it's harder to rebuild and reupload the container (and easy
+to pull the updated scripts we are working on) I'm going to clone the repository for this example.
+
+```bash
+git clone https://www.github.com/vsoch/zenodo-ml
+```
+
+### Container
+
+This is a general pull example
 
 ```bash
 singularity pull --name zenodo-ml docker://vanessa/zenodo-ml
 ```
 
-### Sherlock at Stanford
+This is for Sherlock at Stanford, used in these examples
 
 ```bash
 singularity pull --name zenodo-ml docker://vanessa/zenodo-ml
@@ -45,13 +57,23 @@ Now you have a container binary called `zenodo-ml` in your `$SCRATCH/zenodo-ml` 
 **optional**
 
 The first step is to produce a file called "records.pkl" that should contain about 10K
-different records from the Zenodo API. You should [create an API key](https://zenodo.org/account/settings/applications/tokens/new/), save the key to a file called `.secrets` in the directory you are going to run
+different records from the Zenodo API. You should [create an API key](https://zenodo.org/account/settings/applications/tokens/new/), save the key to a file called `.secrets` in the root zenodo-ml directory you are going to run
 the container, and then run the container and map your present working directory to it. 
 That looks like this:
 
 ```bash
-PYTHONPATH= singularity exec zenodo-ml /opt/conda/bin/python /code/0.download_records.py
+CODE=$SCRATCH/zenodo-ml
+PYTHONPATH= singularity exec --bind $CODE:/code zenodo-ml /opt/conda/bin/python /code/0.download_records.py
 ```
+
+## Slurm
+
+We want to work wit slurm, so let's go into the slurm folder.
+
+```bash
+cd $SCRATCH/zenodo-ml/slurm
+```
+
 
 ## Scripts and Working Location
 
