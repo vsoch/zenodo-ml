@@ -64,54 +64,40 @@ That looks like this:
 ```bash
 CODE=$SCRATCH/zenodo-ml
 PYTHONPATH= singularity exec --bind $CODE:/code zenodo-ml /opt/conda/bin/python /code/0.download_records.py
+https://zenodo.org/api/records/?sort=mostrecent&type=software&page=2&size=1000
+https://zenodo.org/api/records/?sort=mostrecent&type=software&page=3&size=1000
+https://zenodo.org/api/records/?sort=mostrecent&type=software&page=4&size=1000
+https://zenodo.org/api/records/?sort=mostrecent&type=software&page=5&size=1000
+https://zenodo.org/api/records/?sort=mostrecent&type=software&page=6&size=1000
+https://zenodo.org/api/records/?sort=mostrecent&type=software&page=7&size=1000
+https://zenodo.org/api/records/?sort=mostrecent&type=software&page=8&size=1000
+...
+Maximum number of results have been reached.
+https://zenodo.org/api/records/?sort=mostrecent&type=software&page=10&size=1000
+Maximum number of results have been reached.
+Total of 9000 results.
 ```
+
+We set the `PYTHONPATH` to be empty so that the python is isolated to the container. I can't predict what
+you have on your local PYTHONPATH :)
 
 ## Slurm
 
-We want to work wit slurm, so let's go into the slurm folder.
+Once we have our hits data, we want to work wit slurm, so let's go into the slurm folder.
 
 ```bash
 cd $SCRATCH/zenodo-ml/slurm
 ```
 
-
-## Scripts and Working Location
-
-```bash
-cd $SCRATCH/WORK 
-git clone https://www.github.com/singularityhub/container-tree
-cd container-tree/examples/summary_tree_slurm
-```
-
-## Generate Database
-Now we can generate a database pickle!
-
-```bash
-python3 generate.py database.pkl
-Selecting container from https://singularityhub.github.io/api/files...
-Generating comparison tree!
-Adding 54r4/sara-server-vre
-Adding A33a/sjupyter
-Adding A33a/sjupyter@f15489984e4d7751b9e6869553084e5b
-...
-Adding YeoLab/rnashapes@29dfd29177d87eb3dde613580f65f6a6
-Adding YeoLab/rnashapes@19373b5a2b5d8a6b98819ef62d062299
-Adding YeoLab/rnashapes@2d37f3d76367369e8495bdfd7e1c9561
-Saving to database.pkl
-```
-
 ## Submit Jobs
-Once we have our database.pkl, we can submit SLURM jobs to do comparisons!
-This looks trivial here, but in reality it took me a good 30-40 minutes to write
-these scripts, run out of memory several times, wait around for nodes, and then
-want to strangle someone. I suspect this is the typical user experience.
+We could run a script in serial, but we are too impatient for this.
 
-The basic idea is that the script [run.py](run.py) will be used to generate a
-vector of scores for one container (compared to all others) and
+The basic idea is that the script [run.py](run.py) will be used to download and extract
+images and metadata for one entry in records.pkl, each of which is an record from the Zenodo API
+for a particular published code repository. In this case, "published" means that it has been
+given a digital object identifier (DOI) and an archive of the code provided. Thus,
 [run_all.py](run_all.py) will generate a `run_jobs.sh` script to submit instances of it
-to sbatch. When the jobs finish, the script [combine.py](combine.py) 
-will compile the result into one nice object :) Yes, this is annoying as heck
-to just run a sequence of commands.
+to sbatch. 
 
 ### Generate Job Submission Script
 To generate `run_jobs.sh` we need to load the database, and create a jobs and result
@@ -121,6 +107,7 @@ we want to run.
 ```bash
 python run_all.py
 ```
+
 This generated the jobs:
 
 ```bash
