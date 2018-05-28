@@ -9,6 +9,8 @@ import pickle
 import re
 import os
 
+# upper limit of file size, in bytes
+size_limit = 100000
 here = os.path.abspath(os.path.dirname(__file__))
 os.chdir(here)
 
@@ -29,7 +31,9 @@ def get_files(path):
         for filename in filenames:
             fullpath = os.path.join(dirpath, filename)
             if os.path.isfile(fullpath):
-                f.append(os.path.abspath(fullpath))
+                size = os.path.getsize(fullpath)
+                if size <= size_limit:
+                    f.append(os.path.abspath(fullpath))
     return f
 
 
@@ -159,11 +163,19 @@ for uid, hit in hits.items():
                     images = dict()
                 
                     for f in files:
+
                         name = f.replace('%s/'% repo, '')
+
+                        # Don't use images, etc.
                         if '.git' not in name:
+
+                            size = os.path.getsize(f)
+
+                            # Let's limit based on size
+                            if size < size_limit:
    
-                            # We will give the user ordinal
-                            images[name] = create_images(f)
+                                # We will give the user ordinal
+                                images[name] = create_images(f)
 
                     # Metadata is tree and other hit
                     metadata = {'tree': tree, 'hit': hit}
