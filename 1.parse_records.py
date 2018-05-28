@@ -92,7 +92,7 @@ def create_images(filepath, width=80, height=80):
     # Ordinal we can convert to a numpy array
     ordinal = create_array(ordinal, width)
 
-    print('%s has %s %sx%s images' %(filepath, len(finished), width, height))
+    print('%s has %s %sx%s images' %(filepath, len(ordinal), width, height))
     return ordinal
 
 
@@ -163,11 +163,7 @@ for uid, hit in hits.items():
                         if '.git' not in name:
    
                             # We will give the user ordinal
-                            try:
-                                finished = create_images(f)
-                                images[name] = finished
-                            except:
-                                pass
+                            images[name] = create_images(f)
 
                     # Metadata is tree and other hit
                     metadata = {'tree': tree, 'hit': hit}
