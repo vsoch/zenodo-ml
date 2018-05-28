@@ -132,7 +132,11 @@ for uid, hit in hits.items():
                 # If tree in link, grab specific branch 
                 process = True
                 match = re.search('(?P<repo>.+)/tree/(?P<branch>.+)', url)
-                repo = match.group('repo')
+                if match is None:
+                    process = False
+                    repo = None
+                else:
+                    repo = match.group('repo')
 
                 # No idea what gcube is, but it has a gazillion entries
                 if repo is not None:
