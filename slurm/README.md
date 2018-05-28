@@ -112,9 +112,9 @@ This generated the jobs:
 
 ```bash
 ls jobs/
-containertree0.err    containertree3.out  run_101.sh  run_115.sh  run_129.sh  run_142.sh  run_156.sh  run_16.sh   run_183.sh  run_22.sh  run_36.sh  run_4.sh   run_63.sh  run_77.sh  run_90.sh
-containertree0.out    containertree4.err  run_102.sh  run_116.sh  run_12.sh   run_143.sh  run_157.sh  run_170.sh  run_184.sh  run_23.sh  run_37.sh  run_50.sh  run_64.sh  run_78.sh  run_91.sh
-containertree10.err   containertree4.out  run_103.sh  run_117.sh  run_130.sh  run_144.sh  run_158.sh  run_171.sh  run_185.sh  run_24.sh  run_38.sh  run_51.sh  run_65.sh  run_79.sh  run_92.sh
+run_1000400.sh  run_1039952.sh  run_1122955.sh  run_1175323.sh  run_1214698.sh  run_1248981.sh  run_582349.sh  run_837334.sh
+run_1000406.sh  run_1039961.sh  run_1122957.sh  run_1175348.sh  run_1214827.sh  run_1248992.sh  run_582351.sh  run_837336.sh
+run_1000413.sh  run_1039986.sh  run_1122959.sh  run_1175415.sh  run_1214854.sh  run_1248996.sh  run_582354.sh  run_837338.sh
 ...
 ```
 
@@ -123,19 +123,16 @@ You'll notice in the above listing I had already started testing, because I have
 the run_jobs.sh script to get one last line, and run it manually:
 
 ```bash
-sbatch -p russpold /scratch/users/vsochat/WORK/container-tree/examples/summary_tree_slurm/jobs/run_192.sh
+sbatch -p russpold /scratch/users/vsochat/zenodo-ml/slurm/jobs/run_1212458.sh
 ```
 
 You can look at the output and error files to see how you screwed up. Trust me, you will.
 
 ```bash
-cat jobs/containertree192.err
+cat jobs/zenodo-ml-1212458.err
 ```
 
-What errors did I have? I forgot to load a module first. Then I added the line and forget to end the `writelines`
-command with a newline. Then I loaded the wrong version of python and it didn't find the module.
- I wouldn't have known these issues without looking at the error files. I also needed to check 
-continuously on if the job was running, period, with:
+You can check if a job is running with:
 
 ```bash
 squeue --user vsochat
@@ -144,11 +141,25 @@ squeue --user vsochat
 Then check that your output is generated successfully. Is the correct data there?
 
 ```bash
-ls result/
+ls $SCRATCH/WORK/zenodo-ml/1212458
+images_1212458.pkl  metadata_1212458.pkl
 ```
 
+It doesn't hurt to load it and look at it too.
+
+```
+python3
+
+import pickle
+images = pickle.load(open('/scratch/users/vsochat/WORK/zenodo-ml/1212458/images_1212458.pkl','rb'))
+meta = pickle.load(open('/scratch/users/vsochat/WORK/zenodo-ml/1212458/metadata_1212458.pkl','rb'))
+```
+
+Ta da! Let's run en masse.
+
+
 ### Submit All Jobs
-When you are content that you are done screwing up, submit all jobs:
+When you are content that you are done screwing up, you can submit all jobs at once:
 
 ```bash
 bash run_all.sh
@@ -156,22 +167,8 @@ bash run_all.sh
 
 Then pray.
 
-
-## Compile Result
-
-Once the jobs have finished running, your output folder should be robust with pickles!
+OR if you have an upper limit and need to monitor the queue, you can (I have this limitation because Sherlock has a job limit) I've written a silly [submit.py](submit.py) script to do it for us.
 
 ```bash
-ls result/
-
+python3 submit.py
 ```
-
-And you can use combine.py to combine them. Note that it's going to generate
-a data.json in the present working directory. If you did this more nicely, you would
-have written a script to take this as an input argument.
-
-```bash
-python3 combine.py
-```
-
-I'm too ornery with cluster computing to do this nicely :)
