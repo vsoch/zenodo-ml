@@ -2,12 +2,15 @@
 
 from containertree import ContainerTree
 import shutil
+import numpy
 import tempfile
+import pandas
 import pickle
 import re
 import os
 
 here = os.path.abspath(os.path.dirname(__file__))
+os.chdir(here)
 
 def download_repo(repo, branch):
     '''download a Github repository'''
@@ -41,8 +44,15 @@ def make_containertree(uid, files, basepath=None):
     return tree
 
 
+def create_array(ordinal, width=80):
+    '''create array from list of ordinals'''
+    df = pandas.DataFrame(ordinal).loc[:,0:width-1]
+    return df.as_matrix()
+
+
 def create_images(filepath, width=80, height=80):
     '''convert a script into an image'''
+
     with open(filepath,'rb') as fp:
         content = fp.read().decode('utf8', 'ignore')
 
@@ -50,7 +60,7 @@ def create_images(filepath, width=80, height=80):
     lines = content.replace('\r','').replace('\t','    ').split('\n')
 
     # We want to "register" to top left (shebang)
-    finished = []
+    ordinal = []
     start = 0
     finish = start + height
 
@@ -60,21 +70,30 @@ def create_images(filepath, width=80, height=80):
 
         # Each line in subset padded up to width
         subset = [list(p) + (width - len(p)) * [' '] for p in subset]
-        finished.append(subset)
+        subordinal = []
+        for line in subset:
+            ordinal.append([ord(x) for x in line])
         start = finish
         finish = start + height
         
     # Here we might have remainder, we can keep and not use if wanted
     if start < len(lines):
         finish = len(lines) - 1
-        subset = lines[start:finish]
+        if start==finish:
+            subset = lines[start]
+        else:
+            subset = lines[start:finish]
 
         # Each line in subset padded up to width
         subset = [list(p) + (width - len(p)) * [' '] for p in subset]
-        finished.append(subset)
+        for line in subset:
+            ordinal.append([ord(x) for x in line])
+
+    # Ordinal we can convert to a numpy array
+    ordinal = create_array(ordinal, width)
 
     print('%s has %s %sx%s images' %(filepath, len(finished), width, height))
-    return finished
+    return ordinal
 
 
 hits = pickle.load(open('records.pkl', 'rb'))
@@ -86,11 +105,13 @@ if not os.path.exists(output_data):
     os.mkdir(output_data)
 
 # Skip some, too big and annoying for my tiny computer
-if os.path.exists('seen.pkl'):
-    seen = pickle.load(open('seen.pkl','rb'))
+seen_data = '%s/seen.pkl' %here
+if os.path.exists(seen_data):
+    seen = pickle.load(open(seen_data,'rb'))
 else:
-    seen = [806345]
+    seen = []
 
+print('Seen %s records' %len(seen))
 missed = []
 
 for uid, hit in hits.items():
@@ -100,46 +121,60 @@ for uid, hit in hits.items():
                 url = resource['identifier']
                 print('Parsing %s | %s' %(uid, url)) 
 
+                # Cache seen in case need to start over
                 seen.append(uid)
+                pickle.dump(seen, open(seen_data,'wb'))
 
                 # If tree in link, grab specific branch 
+                process = True
                 match = re.search('(?P<repo>.+)/tree/(?P<branch>.+)', url)
                 repo = match.group('repo')
+
+                # No idea what gcube is, but it has a gazillion entries
                 if repo is not None:
-                    repo = download_repo(repo, match.group('branch'))
+                    if "gcube" not in repo:
+                        repo = download_repo(repo, match.group('branch'))
+                    else:
+                        process = False
                 else:
                     missed.append(uid)
-                    continue
+                    process = False
 
-                # Get file listing
-                files = get_files(repo)
+                if process is True:
 
-                # Filename according to id
-                output_folder = os.path.join(output_data, '%s' %hit['id'])
-                output_images = os.path.join(output_folder, 'images_%s.pkl' %hit['id'])
-                output_meta = os.path.join(output_folder, 'metadata_%s.pkl' %hit['id'])
+                    # Get file listing
+                    files = get_files(repo)
 
-                if not os.path.exists(output_folder):
-                    os.mkdir(output_folder)
+                    # Filename according to id
+                    output_folder = os.path.join(output_data, '%s' %hit['id'])
+                    output_images = os.path.join(output_folder, 'images_%s.pkl' %hit['id'])
+                    output_ordinal = os.path.join(output_folder, 'ordinal_%s.pkl' %hit['id'])
+                    output_meta = os.path.join(output_folder, 'metadata_%s.pkl' %hit['id'])
 
-                # For each file, save pickle of images
-                tree = make_containertree(uid, files, basepath=repo)
-                images = dict()
+                    if not os.path.exists(output_folder):
+                        os.mkdir(output_folder)
+
+                    # For each file, save pickle of images
+                    tree = make_containertree(uid, files, basepath=repo)
+                    images = dict()
                 
-                for f in files:
-                    name = f.replace('%s/'% repo, '')
-                    if '.git' not in name:
-                        subset = create_images(f)
-                        images[name] = subset
+                    for f in files:
+                        name = f.replace('%s/'% repo, '')
+                        if '.git' not in name:
+   
+                            # We will give the user ordinal
+                            try:
+                                finished = create_images(f)
+                                images[name] = finished
+                            except:
+                                pass
 
-                # Metadata is tree and other hit
-                metadata = {'tree': tree, 'hit': hit}
+                    # Metadata is tree and other hit
+                    metadata = {'tree': tree, 'hit': hit}
 
-                # Clean up temporary directory
-                shutil.rmtree(repo)
+                    # Clean up temporary directory
+                    shutil.rmtree(repo)
 
-                # Save everything
-                pickle.dump(images, open(output_images,'wb'))
-                pickle.dump(metadata, open(output_meta,'wb'))
-                pickle.dump(seen, open('seen.pkl','wb'))
-
+                    # Save everything
+                    pickle.dump(images, open(output_images,'wb'))
+                    pickle.dump(metadata, open(output_meta,'wb'))

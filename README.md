@@ -1,5 +1,77 @@
 # Zenodo ML
 
+This is a part of the Dinosaur Dataset series. I'll parse a dataset for you to use, show you
+how to use it, and you can do awesome research with it. Instructions for use are below, and
+see the section on Questions if you are looking for ideas of what to do with it.
+
+ - [Generation](#generation): is how I produced the dataset. You can skip it if you just want to use it.
+ - [Usage](#usage): is likely what you are interseted in, how to use the dataset.
+
+
+## Generation
+
+To generate the dataset, the entire code is provided in a Docker container. If you don't
+want to use the version on Docker Hub, you can build it locally.
+
+```bash
+docker build -t vanessa/zenodo-ml .
+```
+
+### Download from Zenodo
+
+**optional**
+
+The first step is to produce a file called "records.pkl" that should contain about 10K
+different records from the Zenodo API. You should [create an API key](https://zenodo.org/account/settings/applications/tokens/new/), save the key to a file called `.secrets` in the directory you are going to run
+the container, and then run the container and map your present working directory to it. 
+That looks like this:
+
+```bash
+docker run -v $PWD:/code -it vanessa/zenodo-ml exec python /code/0.download_records.py
+```
+
+You don't actually need to do this, because the `records.pkl` is already provided in the container.
+
+### Parse Records
+
+**optional**
+
+Once you have the `records.pkl` you can load them in for parsing! This will generate a data
+folder in your present working directory with subfolders, each corresponding to a Zenodo identifier.
+
+```bash
+docker run -v $PWD:/code -it vanessa/zenodo-ml python /code/1.parse_records.py
+```
+
+### Loading Data
+Let's take a look at the contents of one of the subfolders under folder:
+
+```bash
+tree data/1065022/
+    metadata_1065022.pkl    
+    images_1065022.pkl    
+```
+
+The filenames speak for themselves! Each is a python pickle, which means that you can
+load them with `pickle` in Python. The file `images_*.pkl` contains a dictionary data structure
+with keys as files in the repository, and each index into the array is a list of file segments.
+A file segment is an 80x80 section of the file (the key) that has had it's characters converted
+to ordinal. You do this in Python as follows:
+
+```python
+#  Character to Ordinal (number)
+char = 'a'
+number = ord(char)
+print(number)
+97
+
+# Ordinal back to character
+chr(number)
+'a'
+```
+
+## Analysis Ideas
+
 Software, whether compiled or not, is a collection of scripts. A script is a stack of lines,
 and you might be tempted to relate it to a document or page in book. Actually, I think
 we can conceptualize scripts more like images. A script is like an image in that it is a grid
@@ -45,3 +117,4 @@ Here are some early goals that I think this work could help:
 
 ## Personal
 I'm getting a little bored with containers, and even more bored with the current obsession around AI and scaled nonsense. I want to do something different and fun that could be impactful, and at least keep myself busy :)
+
