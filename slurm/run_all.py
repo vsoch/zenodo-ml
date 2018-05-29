@@ -20,11 +20,11 @@ import json
 import sys
 import os
 
+scratch = os.environ['SCRATCH']
 if len(sys.argv) > 1:
     container = sys.argv[1]
 else:
     # We pulled the container here
-    scratch = os.environ['SCRATCH']
     container = os.path.join(scratch, 'zenodo-ml', 'zenodo-ml')
 
 # The container must exist
@@ -71,7 +71,7 @@ for zid in zenodo_ids:
         filey.writelines("#SBATCH --job-name=zenodo-ml_%s\n" %(zid))
         filey.writelines("#SBATCH --output=%s/jobs/zenodo-ml-%s.out\n" %(here,zid))
         filey.writelines("#SBATCH --error=%s/jobs/zenodo-ml-%s.err\n" %(here,zid))
-        filey.writelines("#SBATCH --time=10:00\n")
+        filey.writelines("#SBATCH --time=360:00\n")
         filey.writelines("#SBATCH --mem=8000\n")
         filey.writelines('ml singularity\n')
         args = "%s %s %s" %(zid, outfolder, database)
