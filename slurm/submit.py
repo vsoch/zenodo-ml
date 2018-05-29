@@ -20,6 +20,7 @@ import os
 
 here = os.getcwd()
 jobfile = '%s/run_jobs.sh' %here
+output_folder = '%s/WORK/zenodo-ml' %os.environ['SCRATCH']
 job_limit = 1000
 
 # The container must exist
@@ -30,14 +31,18 @@ if not os.path.exists(jobfile):
 with open(jobfile, 'r') as fh:
     jobs = fh.readlines()
 
-
 def count_queue():
     user = os.environ['USER']
     return int(os.popen('squeue -u %s | wc -l' %user).read().strip('\n'))
 
+idx = 0
 while len(jobs) > 0:
     count = count_queue()
     while count < job_limit:
         job = jobs.pop(0).strip('\n')
-        if not job.startswith('#'):
+        jobnum =  os.path.basename(job).replace('.sh','').split('_')[-1]
+        outfolder = os.path.join(output_folder, jobnum) 
+        if not job.startswith('#') and not os.path.exists(outfolder): 
+            print('Running index %s, zenodo id %s' %jobnum)
             os.system(job)
+        idx+=1
