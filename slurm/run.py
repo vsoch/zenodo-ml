@@ -50,7 +50,9 @@ def unzip(archive, dest):
 
 def untar(archive, dest):
     '''untar an archive to a destination (lazy way)'''
-    retval = os.system('tar -xf %s --directory %s' %(archive, dest))
+    if not os.path.exists(dest):
+        os.mkdir(dest)
+    retval = os.system('tar -xzf %s --directory %s' %(archive, dest))
     if retval == 0:
         return dest
 
@@ -174,6 +176,9 @@ for url in links:
         print('Parsing %s | %s' %(uid, url))
         files = get_files(repo)
 
+        # We don't want to parse github version control
+        files = [f for f in files if '.git' not in f]
+
         # For each file, save pickle of images
         tree = make_containertree(uid, files, basepath=repo)
         images = dict()
@@ -200,4 +205,4 @@ for url in links:
             pickle.dump(metadata, open(output_meta,'wb'))
 
     # Clean up temporary directory
-    shutil.rmtree(repo)
+    shutil.rmtree(os.path.dirname(repo))
