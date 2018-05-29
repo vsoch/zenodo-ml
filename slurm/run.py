@@ -242,4 +242,5 @@ for url in links:
 
 
     # Clean up temporary directory
-    shutil.rmtree(tmpdir)
+    if os.path.exists(tmpdir):
+        shutil.rmtree(tmpdir)
