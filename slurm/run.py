@@ -17,6 +17,7 @@
 
 
 from containertree import ContainerTree
+from urllib.request import urlparse
 import shutil
 import numpy
 import requests
@@ -56,8 +57,17 @@ def untar(archive, dest):
     if retval == 0:
         return dest
 
-def download_repo(url):
+def download_repo(repo):
     '''download a Github repository'''
+    tmpdir = tempfile.mkdtemp()
+    os.chdir(tmpdir)
+    res = os.system('git clone %s' %(repo))
+    name = "%s/%s" %(tmpdir, os.path.basename(repo))
+    return tmpdir, repo
+
+
+def download_archive(url):
+    '''download a Github repository archive'''
     tmpdir = tempfile.mkdtemp()
     os.chdir(tmpdir)
     filename = os.path.join(tmpdir, url.split("/")[-1])   
@@ -74,7 +84,7 @@ def download_repo(url):
             result = untar(filename, dest)
         # Clean up download
         os.remove(filename)
-    return result
+    return tmpdir, result
  
 
 def get_files(path):
@@ -152,6 +162,50 @@ def create_images(filepath, width=80, height=80):
     print('%s has %s %sx%s images' %(filepath, len(ordinal), width, height))
     return ordinal
 
+
+def process_repo(uid, repo, url, output_folder):
+    '''the main function to process the files list for the repo,
+       and save a metadata and images pickle to output_folder
+    '''
+
+    # Filename according to id
+    output_images = os.path.join(output_folder, 'images_%s.pkl' %uid)
+    output_meta = os.path.join(output_folder, 'metadata_%s.pkl' %uid)
+
+    # Get file listing
+    print('Parsing %s | %s' %(uid, url))
+    files = get_files(repo)
+
+    # We don't want to parse github version control
+    files = [f for f in files if '.git' not in f]
+
+    # For each file, save pickle of images
+    tree = make_containertree(uid, files, basepath=repo)
+    images = dict()
+                
+    for f in files:
+
+        name = f.replace('%s/'% repo, '')
+
+        # Limit size to not use images, etc.
+        size = os.path.getsize(f) 
+        if size < size_limit:
+   
+            # We will give the user ordinal
+            try:
+                images[name] = create_images(f)
+            except:
+                pass
+
+        # Metadata is tree and other hit
+        metadata = {'tree': tree, 'hit': hit}
+
+        # Save everything
+        pickle.dump(images, open(output_images,'wb'))
+        pickle.dump(metadata, open(output_meta,'wb'))
+
+
+
 hits = pickle.load(open(records_pkl, 'rb'))
 print('Found %s records' %len(hits))
 
@@ -160,49 +214,32 @@ links = [y['self'] for y in [x['links'] for x in hit['files']]]
 for url in links:
 
     # Download tar.gz repository
-    repo = download_repo(url)
+    tmpdir, repo = download_archive(url)
+
+    # if repo is None, try downloading from Github directly
+    if repo is None:
+
+        # Didn't use the old download
+        shutil.rmtree(tmpdir)
+
+        if 'related_identifiers' in hit['metadata']:
+            for resource in hit['metadata']['related_identifiers']:
+                if "github" in resource['identifier']:
+                    url = urlparse(resource['identifier'])
+                    github = %'/'.join([x for x in url.path.split('/') if x][0:2])
+                    repo = 'https://www.github.com/%s' %github
+                    tmpdir, repo = download_repo(repo)
+                    
 
     if repo is not None:
-
+        
         # Create an output directory
         if not os.path.exists(output_folder):
              os.mkdir(output_folder)
 
-        # Filename according to id
-        output_images = os.path.join(output_folder, 'images_%s.pkl' %hit['id'])
-        output_meta = os.path.join(output_folder, 'metadata_%s.pkl' %hit['id'])
+        # Save metadata and images pickle to output folder
+        process_repo(uid, repo, url, output_folder)
 
-        # Get file listing
-        print('Parsing %s | %s' %(uid, url))
-        files = get_files(repo)
-
-        # We don't want to parse github version control
-        files = [f for f in files if '.git' not in f]
-
-        # For each file, save pickle of images
-        tree = make_containertree(uid, files, basepath=repo)
-        images = dict()
-                
-        for f in files:
-
-            name = f.replace('%s/'% repo, '')
-
-            # Limit size to not use images, etc.
-            size = os.path.getsize(f) 
-            if size < size_limit:
-   
-                # We will give the user ordinal
-                try:
-                    images[name] = create_images(f)
-                except:
-                    pass
-
-            # Metadata is tree and other hit
-            metadata = {'tree': tree, 'hit': hit}
-
-            # Save everything
-            pickle.dump(images, open(output_images,'wb'))
-            pickle.dump(metadata, open(output_meta,'wb'))
 
     # Clean up temporary directory
-    shutil.rmtree(os.path.dirname(repo))
+    shutil.rmtree(tmpdir)
