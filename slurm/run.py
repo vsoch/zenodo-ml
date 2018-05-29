@@ -268,6 +268,6 @@ if not found:
     process_repo(uid, tmpdir, uid, output_folder)
 
 
-    # Clean up temporary directory
-    if os.path.exists(tmpdir):
-        shutil.rmtree(tmpdir)
+# Clean up temporary directory
+if os.path.exists(tmpdir):
+    shutil.rmtree(tmpdir)
