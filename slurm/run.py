@@ -66,6 +66,27 @@ def download_repo(repo):
     return tmpdir, name
 
 
+def download_files(filelist):
+    '''download a list of files'''
+    tmpdir = tempfile.mkdtemp()
+    os.chdir(tmpdir)
+    for filey in filelist:
+        filename = os.path.join(tmpdir, filey.split("/")[-1])   
+        print('Downloading %s' %filename)
+        with open(filename, "wb") as fh:
+            response = requests.get(filey)
+            fh.write(response.content)
+
+        # Decompress any files provided
+        if os.path.exists(filename):
+            if filename.endswith('zip'):
+                unzip(filename, tmpdir)
+            elif filename.endswith('gz'):
+                untar(filename, tmpdir)
+
+    return tmpdir
+
+
 def download_archive(url):
     '''download a Github repository archive'''
     tmpdir = tempfile.mkdtemp()
@@ -210,6 +231,7 @@ hits = pickle.load(open(records_pkl, 'rb'))
 print('Found %s records' %len(hits))
 
 hit = hits[uid]
+found = False
 links = [y['self'] for y in [x['links'] for x in hit['files']]]
 for url in links:
 
@@ -229,7 +251,7 @@ for url in links:
                     github = '/'.join([x for x in url.path.split('/') if x][0:2])
                     repo = 'https://www.github.com/%s' %github
                     tmpdir, repo = download_repo(repo)
-                    
+                    found = True
 
     if repo is not None:
         
@@ -239,6 +261,12 @@ for url in links:
 
         # Save metadata and images pickle to output folder
         process_repo(uid, repo, url, output_folder)
+        found = True
+
+# After parsing through all urls, if we didn't find a result, try parsing files
+if not found:
+    tmpdir = download_files(links)
+    process_repo(uid, tmpdir, uid, output_folder)
 
 
     # Clean up temporary directory
