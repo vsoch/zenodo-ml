@@ -188,6 +188,9 @@ def process_repo(uid, repo, url, output_folder):
     '''the main function to process the files list for the repo,
        and save a metadata and images pickle to output_folder
     '''
+    # Create an output directory
+    if not os.path.exists(output_folder):
+         os.mkdir(output_folder)
 
     # Filename according to id
     output_images = os.path.join(output_folder, 'images_%s.pkl' %uid)
@@ -255,10 +258,6 @@ for url in links:
 
     if repo is not None:
         
-        # Create an output directory
-        if not os.path.exists(output_folder):
-             os.mkdir(output_folder)
-
         # Save metadata and images pickle to output folder
         process_repo(uid, repo, url, output_folder)
         found = True
