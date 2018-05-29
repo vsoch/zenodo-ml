@@ -36,13 +36,13 @@ def count_queue():
     return int(os.popen('squeue -u %s | wc -l' %user).read().strip('\n'))
 
 idx = 0
-while len(jobs) > 0:
+count = count_queue()
+while count < job_limit and len(jobs) > 0:
+    job = jobs.pop(0).strip('\n')
+    jobnum =  os.path.basename(job).replace('.sh','').split('_')[-1]
+    outfolder = os.path.join(output_folder, jobnum) 
+    if not job.startswith('#') and not os.path.exists(outfolder): 
+        print('Running index %s, zenodo id %s' %(idx, jobnum))
+        os.system(job)
+    idx+=1
     count = count_queue()
-    while count < job_limit:
-        job = jobs.pop(0).strip('\n')
-        jobnum =  os.path.basename(job).replace('.sh','').split('_')[-1]
-        outfolder = os.path.join(output_folder, jobnum) 
-        if not job.startswith('#') and not os.path.exists(outfolder): 
-            print('Running index %s, zenodo id %s' %(idx, jobnum))
-            os.system(job)
-        idx+=1
