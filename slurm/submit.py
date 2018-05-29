@@ -43,6 +43,6 @@ while len(jobs) > 0:
         jobnum =  os.path.basename(job).replace('.sh','').split('_')[-1]
         outfolder = os.path.join(output_folder, jobnum) 
         if not job.startswith('#') and not os.path.exists(outfolder): 
-            print('Running index %s, zenodo id %s' %jobnum)
+            print('Running index %s, zenodo id %s' %(idx, jobnum))
             os.system(job)
         idx+=1
