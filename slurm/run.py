@@ -63,7 +63,7 @@ def download_repo(repo):
     os.chdir(tmpdir)
     res = os.system('git clone %s' %(repo))
     name = "%s/%s" %(tmpdir, os.path.basename(repo))
-    return tmpdir, repo
+    return tmpdir, name
 
 
 def download_archive(url):
@@ -226,7 +226,7 @@ for url in links:
             for resource in hit['metadata']['related_identifiers']:
                 if "github" in resource['identifier']:
                     url = urlparse(resource['identifier'])
-                    github = %'/'.join([x for x in url.path.split('/') if x][0:2])
+                    github = '/'.join([x for x in url.path.split('/') if x][0:2])
                     repo = 'https://www.github.com/%s' %github
                     tmpdir, repo = download_repo(repo)
                     
