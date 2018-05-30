@@ -34,7 +34,7 @@ import os
 # The zenodo uid
 uid = int(sys.argv[1])
 
-# Output folder for pickles
+# Output folder
 output_folder = sys.argv[2]
 
 # Records Pickle
@@ -215,7 +215,7 @@ def process_repo(uid, repo, url, output_folder):
     # We don't want to parse github version control
     files = [f for f in files if '.git' not in f]
 
-    # For each file, save pickle of images
+    # For each file, save tree and images list
     tree = make_containertree(uid, files, basepath=repo)
     images = dict()
                 
@@ -269,7 +269,7 @@ for url in links:
 
     if repo is not None:
         
-        # Save metadata and images pickle to output folder
+        # Save metadata and images to output folder
         process_repo(uid, repo, url, output_folder)
         found = True
 
