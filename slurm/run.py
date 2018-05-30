@@ -191,10 +191,18 @@ def create_images(filepath, width=80, height=80):
     return ordinal
 
 
+# Saving functions
+
+def save_json(json_obj, filename, mode="w"):
+    with open(filename, mode) as filey:
+        filey.writelines(print_json(json_obj))
+
 def save_h5(data, output_file, name):
     with h5py.File(output_file, 'w') as h5f:
-        h5f.create_dataset(name, data=data)
-
+        for image_id, image_dataset in data.items():
+            print(image_dataset)
+            print(image_id)
+            h5f.create_dataset(image_id, data=image_data)
 
 def process_repo(uid, repo, url, output_folder):
     '''the main function to process the files list for the repo,
@@ -205,8 +213,8 @@ def process_repo(uid, repo, url, output_folder):
          os.mkdir(output_folder)
 
     # Filename according to id
-    output_images = os.path.join(output_folder, 'images_%s.pkl' %uid)
-    output_meta = os.path.join(output_folder, 'metadata_%s.pkl' %uid)
+    output_images = os.path.join(output_folder, 'images_%s.h5' %uid)
+    output_meta = os.path.join(output_folder, 'metadata_%s.h5' %uid)
 
     # Get file listing
     print('Parsing %s | %s' %(uid, url))
@@ -238,7 +246,7 @@ def process_repo(uid, repo, url, output_folder):
 
     # Save everything
     save_h5(images, output_images, "%s__images" %repo)
-    save_h5(metadata, output_meta, "%s__metadata" %repo)
+    save_json(metadata, output_meta)
 
 
 hits = pickle.load(open(records_pkl, 'rb'))
