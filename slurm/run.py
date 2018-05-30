@@ -202,7 +202,7 @@ def save_h5(data, output_file, name):
         for image_id, image_dataset in data.items():
             print(image_dataset)
             print(image_id)
-            h5f.create_dataset(image_id, data=image_data)
+            h5f.create_dataset(image_id, data=image_dataset)
 
 def process_repo(uid, repo, url, output_folder):
     '''the main function to process the files list for the repo,
@@ -214,7 +214,7 @@ def process_repo(uid, repo, url, output_folder):
 
     # Filename according to id
     output_images = os.path.join(output_folder, 'images_%s.h5' %uid)
-    output_meta = os.path.join(output_folder, 'metadata_%s.h5' %uid)
+    output_meta = os.path.join(output_folder, 'metadata_%s.json' %uid)
 
     # Get file listing
     print('Parsing %s | %s' %(uid, url))
