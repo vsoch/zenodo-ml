@@ -153,6 +153,7 @@ def create_images(filepath, width=80, height=80):
     # We want to "register" to top left (shebang)
     ordinal = []
     start = 0
+    finish = start + height
 
     while finish < len(lines):
         finish = start + height
