@@ -233,12 +233,12 @@ def process_repo(uid, repo, url, output_folder):
             except:
                 pass
 
-        # Metadata is tree and other hit
-        metadata = {'tree': tree, 'hit': hit}
+    # Metadata is tree and other hit
+    metadata = {'tree': tree, 'hit': hit}
 
     # Save everything
     save_h5(images, output_images, "%s__images" %repo)
-    save_h5(images, output_meta, "%s__metadata" %repo)
+    save_h5(metadata, output_meta, "%s__metadata" %repo)
 
 
 hits = pickle.load(open(records_pkl, 'rb'))
