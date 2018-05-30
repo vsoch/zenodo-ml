@@ -25,6 +25,7 @@ import tarfile
 import tempfile
 import pandas
 import pickle
+import h5py
 import zipfile
 import sys
 import re
@@ -190,6 +191,11 @@ def create_images(filepath, width=80, height=80):
     return ordinal
 
 
+def save_h5(data, output_file, name):
+    with open h5py.File(output_file, 'w') as h5f:
+        h5f.create_dataset(name, data=data)
+
+
 def process_repo(uid, repo, url, output_folder):
     '''the main function to process the files list for the repo,
        and save a metadata and images pickle to output_folder
@@ -230,10 +236,9 @@ def process_repo(uid, repo, url, output_folder):
         # Metadata is tree and other hit
         metadata = {'tree': tree, 'hit': hit}
 
-        # Save everything
-        pickle.dump(images, open(output_images,'wb'))
-        pickle.dump(metadata, open(output_meta,'wb'))
-
+    # Save everything
+    save_h5(images, output_images, "%s__images" %repo)
+    save_h5(images, output_meta, "%s__metadata" %repo)
 
 
 hits = pickle.load(open(records_pkl, 'rb'))
