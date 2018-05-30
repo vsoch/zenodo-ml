@@ -192,7 +192,7 @@ def create_images(filepath, width=80, height=80):
 
 
 def save_h5(data, output_file, name):
-    with open h5py.File(output_file, 'w') as h5f:
+    with h5py.File(output_file, 'w') as h5f:
         h5f.create_dataset(name, data=data)
 
 
