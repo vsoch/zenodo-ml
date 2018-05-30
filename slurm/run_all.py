@@ -21,6 +21,7 @@ import sys
 import os
 
 scratch = os.environ['SCRATCH']
+
 if len(sys.argv) > 1:
     container = sys.argv[1]
 else:

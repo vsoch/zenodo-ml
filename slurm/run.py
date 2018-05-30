@@ -134,8 +134,11 @@ def make_containertree(uid, files, basepath=None):
 
 def create_array(ordinal, width=80):
     '''create array from list of ordinals'''
-    df = pandas.DataFrame(ordinal).loc[:,0:width-1]
-    return df.values
+    arrays = []
+    for subordinal in ordinal:
+        df = pandas.DataFrame(subordinal).loc[:,0:width-1]
+        arrays.append(df.values)
+    return arrays
 
 
 def create_images(filepath, width=80, height=80):
@@ -150,17 +153,17 @@ def create_images(filepath, width=80, height=80):
     # We want to "register" to top left (shebang)
     ordinal = []
     start = 0
-    finish = start + height
 
     while finish < len(lines):
-        finish = start + height  
+        finish = start + height
         subset = lines[start:finish]
 
         # Each line in subset padded up to width
         subset = [list(p) + (width - len(p)) * [' '] for p in subset]
         subordinal = []
         for line in subset:
-            ordinal.append([ord(x) for x in line])
+            subordinal.append([ord(x) for x in line])
+        ordinal.append(subordinal)
         start = finish
         finish = start + height
         
@@ -174,8 +177,10 @@ def create_images(filepath, width=80, height=80):
 
         # Each line in subset padded up to width
         subset = [list(p) + (width - len(p)) * [' '] for p in subset]
+        subordinal = []
         for line in subset:
-            ordinal.append([ord(x) for x in line])
+            subordinal.append([ord(x) for x in line])
+        ordinal.append(subordinal)
 
     # Ordinal we can convert to a numpy array
     ordinal = create_array(ordinal, width)
