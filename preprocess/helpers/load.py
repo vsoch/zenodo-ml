@@ -2,9 +2,32 @@
 
 # This script has functions that can be used to load a particular pickle file
 
-import pickle
+import fnmatch
 import numpy
+import os
+import pickle
 
+## Find Files
+
+def recursive_find(base, pattern=None):
+    '''recursive find will yield files in all directory levels that 
+       match a particular pattern below a base path.
+
+       Parameters
+       ==========
+       base: the base path to look under
+       pattern: the pattern to search for
+
+    '''
+    if pattern is None:
+        pattern = "*"
+
+    for root, dirnames, filenames in os.walk(base):
+        for filename in fnmatch.filter(filenames, pattern):
+            yield os.path.join(root, filename)
+
+
+## Loading
 
 def load_all(image_pkl, 
              pad_images=True,
@@ -41,7 +64,9 @@ def load_all(image_pkl,
         # Are we adding padding / filtering?
         if pad_images is True:
             subset = add_padding(subset, length_cutoff, padding_length)
-        final.append(subset)
+
+        if len(subset) > 0:
+            final.append(subset)
 
     return final
 
@@ -82,6 +107,10 @@ def load_by_extension(image_pkl,
         else:
             lookup[ext] = [subset]  
 
+    # Convert to correct type
+    for ext, images in lookup.items():
+        lookup[ext] = make_input_data(images)
+
     return lookup
 
 
@@ -114,7 +143,8 @@ def add_padding(images,
 
             # Doesn't need padding, just append
             else:
-                updated.append(current)
+                if len(current) > 0:
+                    updated.append(current)
 
         # Only add to the padded list if we had any matching
         if len(updated) > 0:
@@ -144,3 +174,10 @@ def pad_image(image, size=(80,80), const=32):
     padded = numpy.ones(size) * const
     padded[:image.shape[0], :image.shape[1]] = image
     return padded
+
+
+def make_input_data(images): 
+    '''Take a list of lists and convert to the correct (numpy array)
+       for being an input/output train/test set 
+    '''
+    return numpy.concatenate([numpy.array(a) for a in images])
