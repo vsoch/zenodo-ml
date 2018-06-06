@@ -6,6 +6,46 @@ import pickle
 import numpy
 
 
+def load_all(image_pkl, 
+             pad_images=True,
+             length_cutoff=30,
+             padding_length=80,
+             script_name=None):
+
+    '''load all data from repository, ignoring extensions, etc.
+       Images that are under 2 lines will be filtered out,
+       those between 2 and 80 will have padding added.
+
+       Parameters
+       ==========
+       image_pkl: full path to the image pickle to load
+       pad_images: if True, run add_padding function based on padding params
+       length_cutoff: images with fewer than length_cutoff lines discarded
+       padding_length: add padding so length == this value (# lines)
+       script_name: if defined, load only scripts with this name included.
+
+    '''
+
+    images = pickle.load(open(image_pkl,"rb"))
+
+    # Create a final list of images
+    final = []
+
+    for filename,subset in images.items():
+
+        # Skip script if doesn't match name, if user wants this
+        if script_name is not None:
+            if script_name.lower() not in filename:
+                continue
+
+        # Are we adding padding / filtering?
+        if pad_images is True:
+            subset = add_padding(subset, length_cutoff, padding_length)
+        final.append(subset)
+
+    return final
+
+
 def load_by_extension(image_pkl, 
                       pad_images=True,
                       length_cutoff=30,
@@ -19,6 +59,9 @@ def load_by_extension(image_pkl,
        Parameters
        ==========
        image_pkl: full path to the image pickle to load
+       pad_images: if True, run add_padding function based on padding params
+       length_cutoff: images with fewer than length_cutoff lines discarded
+       padding_length: add padding so length == this value (# lines)
 
     '''
 
