@@ -49,7 +49,7 @@ the container, and then run the container and map your present working directory
 That looks like this:
 
 ```bash
-docker run -v $PWD:/code -it vanessa/zenodo-ml exec python /code/0.download_records.py
+docker run -v $PWD:/code -it vanessa/zenodo-ml exec python /code/download/0.download_records.py
 ```
 
 You don't actually need to do this, because the `records.pkl` is already provided in the container.
@@ -62,8 +62,8 @@ Once you have the `records.pkl` you can load them in for parsing! This will gene
 folder in your present working directory with subfolders, each corresponding to a Zenodo identifier.
 
 ```bash
-docker run -v $PWD:/data -it vanessa/zenodo-ml python /code/1.parse_records.py
-singularity exec zenodo-ml python /code/1.parse_records.py
+docker run -v $PWD:/data -it vanessa/zenodo-ml python /code/download/1.parse_records.py
+singularity exec zenodo-ml python /code/download/1.parse_records.py
 ```
 
 ### Loading Data
