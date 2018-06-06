@@ -12,12 +12,12 @@ import pickle
 def recursive_find(base, pattern=None):
     '''recursive find will yield files in all directory levels that 
        match a particular pattern below a base path.
-
+       
        Parameters
        ==========
        base: the base path to look under
        pattern: the pattern to search for
-
+       
     '''
     if pattern is None:
         pattern = "*"
@@ -38,7 +38,7 @@ def load_all(image_pkl,
     '''load all data from repository, ignoring extensions, etc.
        Images that are under 2 lines will be filtered out,
        those between 2 and 80 will have padding added.
-
+       
        Parameters
        ==========
        image_pkl: full path to the image pickle to load
@@ -46,7 +46,7 @@ def load_all(image_pkl,
        length_cutoff: images with fewer than length_cutoff lines discarded
        padding_length: add padding so length == this value (# lines)
        script_name: if defined, load only scripts with this name included.
-
+       
     '''
 
     images = pickle.load(open(image_pkl,"rb"))
@@ -80,14 +80,14 @@ def load_by_extension(image_pkl,
        for a repository will be returned with a vector of extensions
        matching it. Images that are under 2 lines will be filtered out,
        those between 2 and 80 will have padding added.
-
+       
        Parameters
        ==========
        image_pkl: full path to the image pickle to load
        pad_images: if True, run add_padding function based on padding params
        length_cutoff: images with fewer than length_cutoff lines discarded
        padding_length: add padding so length == this value (# lines)
-
+       
     '''
 
     images = pickle.load(open(image_pkl,"rb"))
@@ -101,12 +101,11 @@ def load_by_extension(image_pkl,
         if pad_images is True:
             subset = add_padding(subset, length_cutoff, padding_length)
 
-        if len(subset) > 0:
-            ext = filename.split('/')[-1].split('.')[-1]
-            if ext in lookup:
-                lookup[ext].append(subset)
-            else:
-                lookup[ext] = [subset]  
+        ext = filename.split('/')[-1].split('.')[-1]
+        if ext in lookup and subset:
+            lookup[ext].append(subset)
+        else:
+            lookup[ext] = [subset]  
 
     # Convert to correct type
     for ext, images in lookup.items():
@@ -120,36 +119,30 @@ def add_padding(images,
                 padding_length=80):
 
     '''Add padding to an images array.
-
+    
        Parameters
        ==========
        images: an NxN array of images
        length_cutoff: images with fewer than length_cutoff lines discarded
        padding_length: add padding so length == this value (# lines)
-
+       
     '''
     padded = []
 
     # iterate through the list of 80x80 images
     for idx in range(len(images)):
-        current = images[idx]
-        updated = []
+        current_image = images[idx]
 
         # Only consider if greater than the length cutoff
-        if current.shape[0] > length_cutoff:
+        if current_image.shape[0] > length_cutoff:
 
-            # Image needs padding, pad and append
-            if current.shape[0] < padding_length:
-                updated.append(pad_image(current))
+            # Image needs padding.
+            if current_image.shape[0] < padding_length:
+                current_image = pad_image(current_image)
 
-            # Doesn't need padding, just append
-            else:
-                if len(current) > 0:
-                    updated.append(current)
-
-        # Only add to the padded list if we had any matching
-        if len(updated) > 0:
-            padded.append(updated)
+            # Only add to the padded list if we had any matching
+            if len(current_image) > 0:
+                padded.append(current_image)
  
     return padded
 
@@ -157,13 +150,13 @@ def add_padding(images,
 def pad_image(image, size=(80,80), const=32):
     '''Pad an array to a certain size with constant value (ordinal value of 32
        corresponds to a space).
-
+       
        Parameters
        ==========
        image: an NxM numpy array
        size: a tuple of dimensions for the image
        const: the constant value to use for the padding (ordinal 32 is space)
-
+       
     '''
     # check for equivalent dimensions (2)
     assert len(size) == len(image.shape)
@@ -180,12 +173,10 @@ def pad_image(image, size=(80,80), const=32):
 def make_input_data(images): 
     '''Take a list of lists and convert to the correct (numpy array)
        for being an input/output train/test set 
-       
-       Parameters
-       ==========
-       images: a list of lists, each sub list has one or more 80x80 images
-    '''
-    x = []
-    for subset in images:
-        x.append(numpy.concatenate([numpy.array(a) for a in subset]))
-    return numpy.concatenate(x)
+
+        Parameters
+        ==========
+        images: a list of lists, each sub list has one or more 80x80 images
+        
+     '''
+    return numpy.concatenate([numpy.array(a) for a in images])
