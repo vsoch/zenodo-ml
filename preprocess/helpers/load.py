@@ -68,7 +68,7 @@ def load_all(image_pkl,
         if len(subset) > 0:
             final.append(subset)
 
-    return final
+    return make_input_data(final)
 
 
 def load_by_extension(image_pkl, 
@@ -180,5 +180,12 @@ def pad_image(image, size=(80,80), const=32):
 def make_input_data(images): 
     '''Take a list of lists and convert to the correct (numpy array)
        for being an input/output train/test set 
+       
+       Parameters
+       ==========
+       images: a list of lists, each sub list has one or more 80x80 images
     '''
-    return numpy.concatenate([numpy.array(a) for a in images])
+    x = []
+    for subset in images:
+        x.append(numpy.concatenate([numpy.array(a) for a in subset]))
+    return numpy.concatenate(x)
