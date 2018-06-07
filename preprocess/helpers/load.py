@@ -120,6 +120,9 @@ def add_padding(images,
 
     '''Add padding to an images array.
     
+       If one of the images has length greater than padding_length,
+       it will be split into multiple images of length up to padding_length.
+    
        Parameters
        ==========
        images: an NxN array of images
@@ -132,17 +135,25 @@ def add_padding(images,
     # iterate through the list of 80x80 images
     for idx in range(len(images)):
         current_image = images[idx]
+        
+        ## Figure out total number of chuncks per image
+        num_chuncks = int(numpy.ceil(len(current_image)/padding_length))
 
-        # Only consider if greater than the length cutoff
-        if current_image.shape[0] > length_cutoff:
+        ## Iterate over ranges of length padding_length
+        for i in range(num_chuncks):
+            current_image_block = current_image[i*padding_length:min((i+1)*padding_length,
+                                                                     len(current_image)),:]
+            
+            # Only consider if greater than the length cutoff
+            if current_image_block.shape[0] > length_cutoff:
 
-            # Image needs padding.
-            if current_image.shape[0] < padding_length:
-                current_image = pad_image(current_image)
+                # Image needs padding.
+                if current_image_block.shape[0] < padding_length:
+                    current_image_block = pad_image(current_image_block)
 
-            # Only add to the padded list if we had any matching
-            if len(current_image) > 0:
-                padded.append(current_image)
+                # Only add to the padded list if we had any matching
+                if len(current_image_block) > 0:
+                    padded.append(current_image_block)
  
     return padded
 
