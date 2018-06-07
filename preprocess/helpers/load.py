@@ -190,4 +190,6 @@ def make_input_data(images):
         images: a list of lists, each sub list has one or more 80x80 images
         
      '''
+    if not images:
+        return images
     return numpy.concatenate([numpy.array(a) for a in images])
