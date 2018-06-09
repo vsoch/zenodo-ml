@@ -101,11 +101,14 @@ def load_by_extension(image_pkl,
         if pad_images is True:
             subset = add_padding(subset, length_cutoff, padding_length)
 
-        ext = filename.split('/')[-1].split('.')[-1]
-        if ext in lookup and subset:
-            lookup[ext].append(subset)
-        else:
-            lookup[ext] = [subset]  
+        # Only look at non-empty subsets.
+        if subset:
+            # get extension or name of file if no extension
+            ext = filename.split('/')[-1].split('.')[-1]
+            if ext in lookup:
+                lookup[ext].append(subset)
+            else:
+                lookup[ext] = [subset]
 
     # Convert to correct type
     for ext, images in lookup.items():
