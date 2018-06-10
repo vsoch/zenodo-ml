@@ -140,6 +140,24 @@ for tick in ax.get_xticklabels():
 plt.title("Top %s extensions, ordered by total samples across ~10K repositories." %len(x))
 plt.show()
 
+# Make loglog plot and say it's zipfy
+def filter_and_logplot(d, value=100, title=None):
+    if title is None:
+        title = "LogLog Plot for Code Samples by Extension Type, > %s samples" %value
+    filtered = filter_by_value(d, value=value)
+    sorted_counts = sort_dict(filtered)
+    x,y = zip(*sorted_counts)
+    plt.loglog(list(range(1,len(y)+1)), y)
+    plt.title(title)
+    plt.show()
+    return filtered
+
+# The plot is almost linear, which means that the extension with rank K appears
+# about 1/K times the most highly ranked extension. This means that the distribution
+# of samples (representing overall proportion of extension types) is roughly 
+# following the pareto principle.
+
+filtered = filter_and_logplot(ext_counts, value=10000)
 
 # Here is my early thinking about this result. First, these are definitely
 # somewhat scientific code repositories, because we see csv and json in the top
@@ -214,31 +232,109 @@ for image_pkl in recursive_find(data_base, 'images_*.pkl'):
 
 # Again, let's look at the distribution for the top .txt files.
 
-title = "Breakdown of .txt file extension, sample count > 1000"
-filtered = filter_and_plot(txt_counts, value=1000, title=title)
+title = "Breakdown of .txt file extension, sample count > 700"
+filtered = filter_and_plot(txt_counts, value=700, title=title)
 
 # The plot isn't super meaningful, but it narrows down our set to the top
-# 34 files names so we can look at them! 
+# 67 files names so we can look at them! 
 
 sorted_counts = sort_dict(filtered)
 x,y = zip(*sorted_counts)
 
 # Plot the result
 pos = numpy.arange(len(x))
-plt.bar(pos,y,color='g')
-width = 1.0     # gives histogram aspect to the bar diagram
+plt.bar(pos,y,color='g', align='center')
 
 ax = plt.axes()
-ax.set_xticks(pos + (width / 2))
+ax.set_xticks(pos)
 ax.set_xticklabels(x)
 
 # Rotate
 for tick in ax.get_xticklabels():
-    tick.set_rotation(45)
+    tick.set_rotation(90)
 
 # Finishing up Counting - visualize counts and discuss!
 
 plt.title("Breakdown of top %s with .txt extension by total samples across ~10K repositories." %len(x))
 plt.show()
 
-# Make loglog plot and say it's zipfy
+
+################################################################################
+
+# Step 1: Look at Meaningful Files
+
+# There are arguably some "known" files (whether the entire name or piece of an
+# extension" that we can look for to same something (broad)a about these code repositories.
+# Remember that we can get a much better picture if we were to bring in metadata,
+# but for this early work I just want to look across the dataset. Let's first
+# look at general prevalence of LICENSE, README, and files that say something
+# about CONTRIBUTING. These I would call the "reproducibility trio," because
+# generally you would want to see something along these lines for open source
+# software.
+
+# We can also look for containers, Dockerfile or Singularity
+
+counts = dict()
+labels = ['readme','docker','singularity','license']
+for label in labels:
+    counts[label] = 0
+
+count = 0  # there are 9642 total
+
+for image_pkl in recursive_find(data_base, 'images_*.pkl'):
+
+    # find those with README, LICENSE, container, or CONTRIBUTING
+
+    try:
+        readme = load_all(image_pkl, regexp='(R|r)(E|e)(A|a)(d|D)(m|M)(e|E)')
+        license = load_all(image_pkl, regexp='(L|l)(I|i)(C|c)(E|e)(N|n)(S|s)(E|e)')
+        sing = load_all(image_pkl, regexp='Singularity')
+        docker = load_all(image_pkl, regexp='Dockerfile')
+        if len(readme) > 0: counts['readme'] += readme.shape[0]
+        if len(license) > 0: counts['license'] += license.shape[0]
+        if len(sing) > 0: counts['singularity'] += sing.shape[0]
+        if len(docker) > 0: counts['docker'] += docker.shape[0]
+    except:
+         print('Error loading %s!' %image_pkl)
+         continue
+
+    count+=1
+    print('Load %s, %s' %(count, counts.values()))
+
+title = "Counts of Reproducible Files in 10K Github Repos"
+sorted_counts = sort_dict(counts)
+x,y = zip(*sorted_counts)
+
+# Plot the result
+pos = numpy.arange(len(x))
+plt.bar(pos,y,color='g', align='center')
+
+ax = plt.axes()
+ax.set_xticks(pos)
+ax.set_xticklabels(x)
+
+# Rotate
+for tick in ax.get_xticklabels():
+    tick.set_rotation(90)
+
+'''
+{'docker': 473,
+ 'license': 31038,
+ 'readme': 42330,
+ 'singularity': 47}
+'''
+
+# How many on average per repo?
+for kind,c in counts.items():
+    avg = c / count
+    print('Average of %s of type %s' %(avg,kind))
+
+# Average of 4.390168014934661 of type readme
+# Average of 0.04905621240406555 of type docker
+# Average of 0.004874507363617507 of type singularity
+# Average of 3.2190416925948973 of type license
+
+# Finishing up Counting - visualize counts and discuss!
+
+plt.title(title)
+plt.show()

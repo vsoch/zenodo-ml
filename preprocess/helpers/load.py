@@ -34,6 +34,7 @@ def load_all(image_pkl,
              pad_images=True,
              length_cutoff=30,
              padding_length=80,
+             regexp=None,
              script_name=None):
 
     '''load all data from repository, ignoring extensions, etc.
@@ -47,6 +48,7 @@ def load_all(image_pkl,
        length_cutoff: images with fewer than length_cutoff lines discarded
        padding_length: add padding so length == this value (# lines)
        script_name: if defined, load only scripts with this name included.
+       regexp: if provided, use a regular expression to filter
        
     '''
 
@@ -58,7 +60,11 @@ def load_all(image_pkl,
     for filename,subset in images.items():
 
         # Skip script if doesn't match name, if user wants this
-        if script_name is not None:
+        if regexp is not None:
+            if not re.search(regexp, filename):
+                continue
+
+        elif script_name is not None:
             if script_name.lower() not in filename:
                 continue
 
