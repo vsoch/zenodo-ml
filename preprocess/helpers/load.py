@@ -5,6 +5,7 @@
 import fnmatch
 import numpy
 import os
+import re
 import pickle
 
 ## Find Files
@@ -65,10 +66,50 @@ def load_all(image_pkl,
         if pad_images is True:
             subset = add_padding(subset, length_cutoff, padding_length)
 
-        if len(subset) > 0:
+        if subset:
             final.append(subset)
 
     return make_input_data(final)
+
+
+def load_by_regexp(image_pkl, 
+                   pad_images=True,
+                   length_cutoff=30,
+                   padding_length=80,
+                   regexp=None):
+
+    '''load based on a regular expression. index dictionary based on file name.
+    '''
+
+    images = pickle.load(open(image_pkl, "rb"))
+
+    # Create a final lookup of images
+    lookup = dict()
+
+    for filename,subset in images.items():
+
+        # Skip script if doesn't match name, if user wants this
+        if not re.search(regexp, filename):
+            continue
+
+        # Are we adding padding / filtering?
+        if pad_images is True:
+            subset = add_padding(subset, length_cutoff, padding_length)
+
+        if len(subset) > 0:
+            basename = os.path.basename(filename)
+
+            if basename in lookup:
+                lookup[basename].append(subset)
+            else:
+                lookup[basename] = [subset]
+
+    # Convert to correct type
+    for basename, images in lookup.items():
+        lookup[basename] = make_input_data(images)
+
+    return lookup
+
 
 
 def load_by_extension(image_pkl, 
@@ -103,6 +144,7 @@ def load_by_extension(image_pkl,
 
         # Only look at non-empty subsets.
         if subset:
+
             # get extension or name of file if no extension
             ext = filename.split('/')[-1].split('.')[-1]
             if ext in lookup:
