@@ -1,12 +1,14 @@
 # Zenodo ML
 
-This is a part of the [Dinosaur Dataset](https://vsoch.github.io/datasets) series. I'll parse a dataset for you to use, show you
-how to use it, and you can do awesome research with it. Instructions for use are below, and
-see the section on Questions if you are looking for ideas of what to do with it.
+This is a part of the [Dinosaur Dataset](https://vsoch.github.io/datasets) series. I'll parse a dataset for you to use, show you how to use it, and you can do awesome research with it. Instructions for 
+generation are below, and see the section on Questions if you are looking for ideas of what to do with it.
+The link below provides instructions for downloading the dataset releases, along with links to example analyses with it.
 
- - [Generation](#generation): is how I produced the dataset. You can skip it if you just want to use it.
- - [Usage](#usage): is likely what you are interseted in, how to use the dataset.
+ - [Instructions](https://vsoch.github.io/datasets/2018/zenodo/#what-can-i-learn-from-this-dataset): for download and use are provided on the Dinosaur Dataset Site
 
+If you use this dataset in your work, please cite the Zenodo DOI:
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1286417.svg)](https://doi.org/10.5281/zenodo.1286417)
 
 ## Assumptions
 
@@ -106,15 +108,7 @@ images = pickle.load(open(image_pkl, 'rb'))
 Remember, this entire pickle is for just one repository that is found in a record from Zenodo! If you
 look at the images "keys" you will see that each one corresponds to a file in the repository.
 
-```python
-images.keys()
-```
-
-It follows, then, that if we index images for a particular key, we are going to find images! Specifically,
-we will find a giant list of 80x80 images, where each image is a 2D numpy array with characters converted
-to ordinal (as we showed above).
-
-**more coming soon!**
+For complete usage and tutorial, see the page on [dinosaur datasets](https://vsoch.github.io/datasets/2018/zenodo/#what-can-i-learn-from-this-dataset).
 
 ## Analysis Ideas
 
@@ -161,6 +155,4 @@ Here are some early goals that I think this work could help:
  - **comparison of containers**: in that our "unit of understanding" is not an entire container, if we are able to identify features of software, and then identify groups of software in containers, we can again better label the purpose / domain of the contianer.
  - **optimized / automated script generation**: If we have features of software, the next step is to make an association between features and what constitutes "good" software. For example, if I can measure the resource usage or system calls of a particular piece of software and I also can extract (humanly interpretable) features about it, I can use this information to make predictions about other software without using it.
 
-## Personal
-I'm getting a little bored with containers, and even more bored with the current obsession around AI and scaled nonsense. I want to do something different and fun that could be impactful, and at least keep myself busy :)
-
+For complete usage and tutorial, see the page on [dinosaur datasets](https://vsoch.github.io/datasets/2018/zenodo/#what-can-i-learn-from-this-dataset).

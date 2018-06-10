@@ -97,7 +97,7 @@ def load_by_regexp(image_pkl,
             subset = add_padding(subset, length_cutoff, padding_length)
 
         if len(subset) > 0:
-            basename = os.path.basename(filename)
+            basename = filename.split('/')[-1]
 
             if basename in lookup:
                 lookup[basename].append(subset)

@@ -83,10 +83,12 @@ def filter_by_value(d, value=100, plot=True):
     return filtered
 
 
-def filter_and_plot(d, value=100):
+def filter_and_plot(d, value=100, title=None):
+    if title is None:
+        title = "Proportion of Code by Extension Type, > %s samples" %value
     filtered = filter_by_value(d, value=value)
     plt.hist(list(filtered.values()), bins=10)
-    plt.title("Proportion of Code by Extension Type, > %s samples" %value)
+    plt.title(title)
     plt.show()
     return filtered
 
@@ -199,6 +201,7 @@ for image_pkl in recursive_find(data_base, 'images_*.pkl'):
 
     for ext, imageset in images.items():
     
+        print('Adding %s' %ext)
         # If we don't have a label yet for ext
         if ext not in txt_counts:
             txt_counts[ext] = imageset.shape[0]
@@ -211,5 +214,31 @@ for image_pkl in recursive_find(data_base, 'images_*.pkl'):
 
 # Again, let's look at the distribution for the top .txt files.
 
+title = "Breakdown of .txt file extension, sample count > 1000"
+filtered = filter_and_plot(txt_counts, value=1000, title=title)
+
+# The plot isn't super meaningful, but it narrows down our set to the top
+# 34 files names so we can look at them! 
+
+sorted_counts = sort_dict(filtered)
+x,y = zip(*sorted_counts)
+
+# Plot the result
+pos = numpy.arange(len(x))
+plt.bar(pos,y,color='g')
+width = 1.0     # gives histogram aspect to the bar diagram
+
+ax = plt.axes()
+ax.set_xticks(pos + (width / 2))
+ax.set_xticklabels(x)
+
+# Rotate
+for tick in ax.get_xticklabels():
+    tick.set_rotation(45)
+
+# Finishing up Counting - visualize counts and discuss!
+
+plt.title("Breakdown of top %s with .txt extension by total samples across ~10K repositories." %len(x))
+plt.show()
 
 # Make loglog plot and say it's zipfy
