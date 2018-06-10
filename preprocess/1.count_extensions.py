@@ -124,11 +124,11 @@ x,y = zip(*sorted_counts)
 
 # Plot the result
 pos = numpy.arange(len(x))
-plt.bar(pos,y,color='g')
+plt.bar(pos,y,color='g',align='center')
 width = 1.0     # gives histogram aspect to the bar diagram
 
 ax = plt.axes()
-ax.set_xticks(pos + (width / 2))
+ax.set_xticks(pos)
 ax.set_xticklabels(x)
 
 # Rotate
