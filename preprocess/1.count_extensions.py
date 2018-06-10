@@ -133,7 +133,7 @@ ax.set_xticklabels(x)
 
 # Rotate
 for tick in ax.get_xticklabels():
-    tick.set_rotation(45)
+    tick.set_rotation(90)
 
 # Finishing up Counting - visualize counts and discuss!
 
