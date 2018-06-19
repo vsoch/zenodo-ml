@@ -27,3 +27,8 @@ done
 # Extension md has 49654 png image files
 # Extension txt has 450363 png image files
 # Extension xml has 190485 png image files
+
+total=$(find "." -type f -name *.png | wc -l)
+echo "Total of ${total} png images."
+
+# Total of 3416391 png images

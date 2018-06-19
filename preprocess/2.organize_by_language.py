@@ -20,8 +20,6 @@ from helpers.load import ( recursive_find, load_all, load_by_extension )
 import cv2
 import os
 
-cv2.imwrite('myImage.png',myImg)
-
 data_base = '/tmp/data'
 data_reorg_base = '/tmp/data1'
 data_reorg = '%s/data' %data_reorg_base
