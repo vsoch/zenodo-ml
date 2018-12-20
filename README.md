@@ -12,6 +12,7 @@ If you use this dataset in your work, please cite the Zenodo DOI:
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1286417.svg)](https://doi.org/10.5281/zenodo.1286417)
 
+
 ## Assumptions
 
  1. We use an "image size" of 80 by 80, under the assumption that the typical editor / programming language prefers lines of max length 80 (see Python's Pep8 specification) and most machine learning algorithms prefer square images.
