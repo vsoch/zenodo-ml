@@ -6,6 +6,7 @@ The link below provides instructions for downloading the dataset releases, along
 
  - [Instructions](https://vsoch.github.io/datasets/2018/zenodo/#what-can-i-learn-from-this-dataset): for download and use are provided on the Dinosaur Dataset Site
  - [Schema.org Dataset](https://vsoch.github.io/zenodo-ml/) metadata is generated on the Github Pages associated with this repository. See the [.github/main.workflow](.github/main.workflow) for how this is done.
+ - [Validate Dataset](https://search.google.com/structured-data/testing-tool/u/0/#url=https://vsoch.github.io/zenodo-ml) here using the Google Dataset Testing Tool
 
 If you use this dataset in your work, please cite the Zenodo DOI:
 
