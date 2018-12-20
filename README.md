@@ -20,7 +20,6 @@ If you use this dataset in your work, please cite the Zenodo DOI:
  4. I filtered out repos that (were strangely common) related to something to do with "gcube."
  5. We take a greedy approach in parsing files - in the case that a single file produces some special error, we pass it in favor of continued processing of the rest.
 
-
 ## Generation
 
 To generate the dataset, the entire code is provided in a Docker container. If you don't
