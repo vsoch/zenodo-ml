@@ -125,28 +125,27 @@ methods like Word2Vec to assess code in terms of lines, I believe that the large
 previous and next lines are important too. Thus, my specific aims are the following:
 
 ## Input Data
-First I will
+The first step above is the following:
 
 > identify a corpus of scripts and metadata
 
 Zenodo, specifically the "software" bucket, is ideal for this case. From this database
-I can extract about 10,000 software records, most of which are linked to a Github repository
+I could extract about 10,000 software records, most of which are linked to a Github repository
 and carry various amounts of metadata (from keywords to entire manuscript publications).
 
 ## Preprocessing
-Then I will preprocess this data, meaning download of the repository, reading of the script files,
-and representation of each file as an image. We will need to have equivalent dimensions regardless
-of the language, and so I am not sure yet if I will want to "crop" the scripts in some manner,
-or segment them into smaller pieces first.
+Then I preprocessed this data, meaning download of the repository, reading of the script files,
+and representation of each file as an image. We enforced equivalent dimensions (80x80) regardless
+of the language.
 
 ## Relationship Extraction
 The relationship (how two files are related to one another) in terms of location in the repository
-might be meaningful, and so I will want to extract features related to this.
+might be meaningful, and so this could be of further interest to extract.
 
 ## Deep Learning
-I want to give a go at using convolutional neural networks to generate features of the scripts.
-I'm not experienced in doing this so I don't know what kinds of questions / analyses I'd like to try
-until I dig in a bit.
+The first suggestion is to use convolutional neural networks to generate features of the scripts.
+I'm not experienced in doing this so I don't know what kinds of questions / analyses I'd like to try, 
+please reach out if you would like to work together on this! Here are some overall ideas for goals:
 
 # Goals
 
