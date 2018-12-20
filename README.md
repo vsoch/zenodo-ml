@@ -5,6 +5,7 @@ generation are below, and see the section on Questions if you are looking for id
 The link below provides instructions for downloading the dataset releases, along with links to example analyses with it.
 
  - [Instructions](https://vsoch.github.io/datasets/2018/zenodo/#what-can-i-learn-from-this-dataset): for download and use are provided on the Dinosaur Dataset Site
+ - [Schema.org Dataset](https://vsoch.github.io/zenodo-ml/) metadata is generated on the Github Pages associated with this repository. See the [.github/main.workflow](.github/main.workflow) for how this is done.
 
 If you use this dataset in your work, please cite the Zenodo DOI:
 
